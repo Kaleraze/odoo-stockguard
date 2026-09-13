@@ -72,17 +72,30 @@ QWeb (PDF reports).
       `ir.actions.report` record, bound to the model so it shows up in the form's
       Print menu. Prints several requests at once, one page each, with a coloured
       status stamp. 51 tests green.
-- [ ] Phase 6: Deploy + README/architecture diagram
+- [x] Phase 6: Removed the Hello World scaffolding, added demo data so a fresh
+      install shows a populated board, wrote README.md with mermaid architecture
+      / ERD / state diagrams, added `deploy/` (hardened compose + prod config +
+      `.env.example`), LICENSE, and `docs/sample-approval-request.pdf`.
+      Repository initialised with one commit. 49 tests green.
 
-Current status: Phase 5 done, 51 tests green. Next up is Phase 6 (deploy + README
-+ architecture diagram), which also includes deleting the `stockguard.hello`
-scaffolding from Phase 1 and its developer-mode menu.
+Current status: **Project 1 (StockGuard) is complete** — all phases done, 49 tests
+green, committed. Project 2 (Legacy2Odoo) comes next and belongs in its own
+repository, not this one; it talks to Odoo from the outside over its API, which
+is also how the architecture should be described in its README.
 
-Sample data seeded in the dev database: six approval requests covering every
-state (`WAR/2026/00216` is waiting on Mitchell Admin, so the Approve button is
-clickable straight after logging in as `admin`), and two approver logins
-`somchai` / `somying` (password same as login, both in Warehouse Approver +
-Stock User groups) for walking the workflow as different people in the UI.
+Two databases exist in the dev stack:
+
+- `stockguard_fresh` — installed from scratch following the README, so the
+  module's own demo data is the only content and references start at
+  `WAR/2026/00001`. Use this one for portfolio screenshots.
+- `stockguard_dev` — the working database from Phases 1-6. Carries leftovers
+  from manual `odoo shell` seeding (references up to `WAR/2026/00254`, extra
+  logins `somchai` / `somying`, password same as login). Safe to drop once
+  screenshots are taken.
+
+Demo users shipped by the module: `sg_qc_supervisor` (approver) and
+`sg_warehouse_manager` (manager). They have no password set — assign one via
+Settings or `odoo shell` before logging in as them.
 
 ### Two PDF gotchas found in Phase 5
 
