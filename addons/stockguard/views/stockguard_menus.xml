@@ -1,0 +1,24 @@
+<odoo>
+
+    <menuitem id="menu_stockguard_root"
+              name="StockGuard"
+              sequence="85"/>
+
+    <menuitem id="menu_stockguard_operations"
+              name="Operations"
+              parent="menu_stockguard_root"
+              sequence="10"/>
+
+    <menuitem id="menu_warehouse_approval_request"
+              name="Approval Requests"
+              parent="menu_stockguard_operations"
+              action="action_warehouse_approval_request"
+              sequence="10"/>
+
+    <menuitem id="menu_stockguard_lots"
+              name="Lots / Serial Numbers"
+              parent="menu_stockguard_operations"
+              action="stock.action_production_lot_form"
+              sequence="20"/>
+
+</odoo>

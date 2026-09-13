@@ -1,0 +1,146 @@
+<odoo>
+
+    <record id="demo_user_qc_supervisor" model="res.users" context="{'no_reset_password': True}">
+        <field name="name">Somchai P. (QC Supervisor)</field>
+        <field name="login">sg_qc_supervisor</field>
+        <field name="groups_id"
+               eval="[(6, 0, [ref('stockguard.group_warehouse_approver'), ref('stock.group_stock_user')])]"/>
+    </record>
+
+    <record id="demo_user_warehouse_manager" model="res.users" context="{'no_reset_password': True}">
+        <field name="name">Somying T. (Warehouse Manager)</field>
+        <field name="login">sg_warehouse_manager</field>
+        <field name="groups_id"
+               eval="[(6, 0, [ref('stockguard.group_warehouse_manager'), ref('stock.group_stock_user')])]"/>
+    </record>
+
+    <record id="demo_product_amoxicillin" model="product.product">
+        <field name="name">Amoxicillin 250mg Capsule</field>
+        <field name="type">product</field>
+        <field name="tracking">lot</field>
+    </record>
+
+    <record id="demo_product_insulin" model="product.product">
+        <field name="name">Insulin Glargine 100IU/ml</field>
+        <field name="type">product</field>
+        <field name="tracking">lot</field>
+    </record>
+
+    <record id="demo_lot_amoxicillin" model="stock.lot">
+        <field name="name">DEMO-AMOX-0001</field>
+        <field name="product_id" ref="demo_product_amoxicillin"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="quality_state">failed</field>
+        <field name="is_restricted" eval="True"/>
+    </record>
+
+    <record id="demo_lot_insulin" model="stock.lot">
+        <field name="name">DEMO-INSU-0002</field>
+        <field name="product_id" ref="demo_product_insulin"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="quality_state">pending</field>
+        <field name="is_restricted" eval="True"/>
+    </record>
+
+    <record id="demo_lot_insulin_damaged" model="stock.lot">
+        <field name="name">DEMO-INSU-0003</field>
+        <field name="product_id" ref="demo_product_insulin"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="quality_state">failed</field>
+        <field name="is_restricted" eval="True"/>
+    </record>
+
+    <!-- Draft: still being written up, nobody has been asked yet. -->
+    <record id="demo_request_draft" model="warehouse.approval.request">
+        <field name="lot_id" ref="demo_lot_amoxicillin"/>
+        <field name="request_type">quantity_adjustment</field>
+        <field name="quantity">12</field>
+        <field name="reason">Cycle count found 12 capsules short against the system quantity.</field>
+        <field name="requested_by_id" ref="base.user_demo"/>
+        <field name="request_date" eval="DateTime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+    <record id="demo_request_draft_level_1" model="warehouse.approval.line">
+        <field name="request_id" ref="demo_request_draft"/>
+        <field name="level">1</field>
+        <field name="approver_id" ref="demo_user_warehouse_manager"/>
+    </record>
+
+    <!-- Pending: level 1 is waiting on the QC supervisor. -->
+    <record id="demo_request_pending" model="warehouse.approval.request">
+        <field name="lot_id" ref="demo_lot_insulin"/>
+        <field name="request_type">quarantine_release</field>
+        <field name="quantity">150</field>
+        <field name="reason">Second lab report confirms the batch is within specification.</field>
+        <field name="requested_by_id" ref="base.user_demo"/>
+        <field name="state">pending_approval</field>
+        <field name="request_date"
+               eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+    <record id="demo_request_pending_level_1" model="warehouse.approval.line">
+        <field name="request_id" ref="demo_request_pending"/>
+        <field name="level">1</field>
+        <field name="approver_id" ref="demo_user_qc_supervisor"/>
+    </record>
+
+    <record id="demo_request_pending_level_2" model="warehouse.approval.line">
+        <field name="request_id" ref="demo_request_pending"/>
+        <field name="level">2</field>
+        <field name="approver_id" ref="demo_user_warehouse_manager"/>
+    </record>
+
+    <!-- Approved: both levels signed off, so the lot was released. -->
+    <record id="demo_request_approved" model="warehouse.approval.request">
+        <field name="lot_id" ref="demo_lot_amoxicillin"/>
+        <field name="request_type">quality_override</field>
+        <field name="quantity">60</field>
+        <field name="reason">Cold chain excursion reviewed and accepted by QA.</field>
+        <field name="requested_by_id" ref="base.user_demo"/>
+        <field name="state">approved</field>
+        <field name="request_date"
+               eval="(DateTime.now() - timedelta(days=5)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+    <record id="demo_request_approved_level_1" model="warehouse.approval.line">
+        <field name="request_id" ref="demo_request_approved"/>
+        <field name="level">1</field>
+        <field name="approver_id" ref="demo_user_qc_supervisor"/>
+        <field name="state">approved</field>
+        <field name="comment">Certificate of analysis checked against the excursion log.</field>
+        <field name="decision_date"
+               eval="(DateTime.now() - timedelta(days=4)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+    <record id="demo_request_approved_level_2" model="warehouse.approval.line">
+        <field name="request_id" ref="demo_request_approved"/>
+        <field name="level">2</field>
+        <field name="approver_id" ref="demo_user_warehouse_manager"/>
+        <field name="state">approved</field>
+        <field name="decision_date"
+               eval="(DateTime.now() - timedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+    <!-- Rejected: one refusal is enough to stop the whole request. -->
+    <record id="demo_request_rejected" model="warehouse.approval.request">
+        <field name="lot_id" ref="demo_lot_insulin_damaged"/>
+        <field name="request_type">disposal</field>
+        <field name="quantity">500</field>
+        <field name="reason">Packaging damaged in transit, proposing disposal of the full lot.</field>
+        <field name="requested_by_id" ref="base.user_demo"/>
+        <field name="state">rejected</field>
+        <field name="request_date"
+               eval="(DateTime.now() - timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+    <record id="demo_request_rejected_level_1" model="warehouse.approval.line">
+        <field name="request_id" ref="demo_request_rejected"/>
+        <field name="level">1</field>
+        <field name="approver_id" ref="demo_user_warehouse_manager"/>
+        <field name="state">rejected</field>
+        <field name="comment">Salvageable after repackaging, send it back to QC instead.</field>
+        <field name="decision_date"
+               eval="(DateTime.now() - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+</odoo>

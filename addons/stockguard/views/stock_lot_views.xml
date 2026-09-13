@@ -1,0 +1,40 @@
+<odoo>
+
+    <record id="view_production_lot_form_stockguard" model="ir.ui.view">
+        <field name="name">stock.lot.form.stockguard</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_approval_requests" type="object"
+                        class="oe_stat_button" icon="fa-check-square-o">
+                    <field name="approval_request_count" widget="statinfo" string="Approvals"/>
+                </button>
+            </xpath>
+            <xpath expr="//group[@name='main_group']" position="inside">
+                <group string="StockGuard" name="stockguard_lot_group">
+                    <field name="quality_state"/>
+                    <field name="is_restricted"/>
+                    <field name="supplier_id"/>
+                    <field name="received_date"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_production_lot_tree_stockguard" model="ir.ui.view">
+        <field name="name">stock.lot.tree.stockguard</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="quality_state" widget="badge"
+                       decoration-success="quality_state == 'passed'"
+                       decoration-warning="quality_state == 'pending'"
+                       decoration-danger="quality_state == 'failed'"/>
+                <field name="is_restricted" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

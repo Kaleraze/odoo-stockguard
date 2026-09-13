@@ -1,0 +1,231 @@
+<odoo>
+
+    <record id="view_warehouse_approval_request_tree" model="ir.ui.view">
+        <field name="name">warehouse.approval.request.tree</field>
+        <field name="model">warehouse.approval.request</field>
+        <field name="arch" type="xml">
+            <tree string="Approval Requests"
+                  decoration-info="state == 'draft'"
+                  decoration-warning="state == 'pending_approval'"
+                  decoration-muted="state == 'rejected'">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="quantity" sum="Total Quantity"/>
+                <field name="request_type"/>
+                <field name="requested_by_id" widget="many2one_avatar_user"/>
+                <field name="current_level" string="Level"/>
+                <field name="pending_approver_ids" widget="many2many_tags" string="Waiting On"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'pending_approval'"
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state == 'rejected'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_warehouse_approval_request_form" model="ir.ui.view">
+        <field name="name">warehouse.approval.request.form</field>
+        <field name="model">warehouse.approval.request</field>
+        <field name="arch" type="xml">
+            <form string="Approval Request">
+                <header>
+                    <button name="action_submit" type="object" string="Submit for Approval"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="oe_highlight" invisible="not can_approve"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="not can_approve"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state != 'rejected'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,pending_approval,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group name="what">
+                            <field name="lot_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="product_id"/>
+                            <field name="quantity" readonly="state != 'draft'"/>
+                            <field name="request_type" readonly="state != 'draft'"/>
+                        </group>
+                        <group name="who">
+                            <field name="requested_by_id" readonly="state != 'draft'"
+                                   widget="many2one_avatar_user"/>
+                            <field name="request_date" readonly="state != 'draft'"/>
+                            <field name="current_level" invisible="state != 'pending_approval'"/>
+                            <field name="pending_approver_ids" widget="many2many_tags"
+                                   invisible="state != 'pending_approval'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="can_approve" invisible="1"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1" readonly="state != 'draft'"
+                               placeholder="Why does this lot need an exception?"/>
+                    </group>
+                    <notebook>
+                        <page string="Approval Levels" name="approval_levels">
+                            <field name="approval_line_ids" readonly="state != 'draft'">
+                                <tree editable="bottom"
+                                      decoration-success="state == 'approved'"
+                                      decoration-danger="state == 'rejected'">
+                                    <field name="level"/>
+                                    <field name="approver_id" widget="many2one_avatar_user"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'approved'"
+                                           decoration-danger="state == 'rejected'"/>
+                                    <field name="decision_date"/>
+                                    <field name="comment"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_warehouse_approval_request_kanban" model="ir.ui.view">
+        <field name="name">warehouse.approval.request.kanban</field>
+        <field name="model">warehouse.approval.request</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column" quick_create="0">
+                <field name="state"/>
+                <field name="current_level"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                    <span class="o_kanban_record_subtitle text-muted">
+                                        <field name="product_id"/>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>
+                                    <field name="lot_id"/> &#8226; <field name="quantity"/>
+                                </div>
+                                <div class="text-muted">
+                                    <field name="request_type"/>
+                                </div>
+                                <div t-if="record.state.raw_value == 'pending_approval'" class="mt-1">
+                                    <i class="fa fa-hourglass-half me-1" title="Waiting on"/>
+                                    Level <field name="current_level"/>:
+                                    <field name="pending_approver_ids" widget="many2many_tags"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="request_date" widget="date"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="requested_by_id" widget="many2one_avatar_user"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_warehouse_approval_request_search" model="ir.ui.view">
+        <field name="name">warehouse.approval.request.search</field>
+        <field name="model">warehouse.approval.request</field>
+        <field name="arch" type="xml">
+            <search string="Approval Requests">
+                <field name="name" string="Reference"/>
+                <field name="lot_id"/>
+                <field name="product_id"/>
+                <field name="requested_by_id"/>
+                <filter name="filter_waiting_for_me" string="Waiting For Me"
+                        domain="[('pending_approver_ids', 'in', uid)]"/>
+                <filter name="filter_my_requests" string="My Requests"
+                        domain="[('requested_by_id', '=', uid)]"/>
+                <separator/>
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_pending" string="Pending Approval"
+                        domain="[('state', '=', 'pending_approval')]"/>
+                <filter name="filter_approved" string="Approved"
+                        domain="[('state', '=', 'approved')]"/>
+                <filter name="filter_rejected" string="Rejected"
+                        domain="[('state', '=', 'rejected')]"/>
+                <separator/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_request_type" string="Request Type"
+                            context="{'group_by': 'request_type'}"/>
+                    <filter name="group_product" string="Product"
+                            context="{'group_by': 'product_id'}"/>
+                    <filter name="group_requested_by" string="Requested By"
+                            context="{'group_by': 'requested_by_id'}"/>
+                    <filter name="group_request_date" string="Request Date"
+                            context="{'group_by': 'request_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_warehouse_approval_request_graph" model="ir.ui.view">
+        <field name="name">warehouse.approval.request.graph</field>
+        <field name="model">warehouse.approval.request</field>
+        <field name="arch" type="xml">
+            <graph string="Approval Requests" type="bar">
+                <field name="request_type"/>
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_warehouse_approval_request_pivot" model="ir.ui.view">
+        <field name="name">warehouse.approval.request.pivot</field>
+        <field name="model">warehouse.approval.request</field>
+        <field name="arch" type="xml">
+            <pivot string="Approval Requests">
+                <field name="request_type" type="row"/>
+                <field name="state" type="col"/>
+                <field name="quantity" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_warehouse_approval_request" model="ir.actions.act_window">
+        <field name="name">Approval Requests</field>
+        <field name="res_model">warehouse.approval.request</field>
+        <field name="view_mode">kanban,tree,form,graph,pivot</field>
+        <field name="search_view_id" ref="view_warehouse_approval_request_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Raise your first warehouse approval request
+            </p>
+            <p>
+                Restricted lots need an approved request before they can move.
+                Each request runs through the approval levels you define, one level
+                at a time.
+            </p>
+        </field>
+    </record>
+
+</odoo>

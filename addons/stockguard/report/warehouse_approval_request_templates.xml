@@ -1,0 +1,113 @@
+<odoo>
+
+    <template id="report_warehouse_approval_request_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <div class="row mb-4">
+                    <div class="col-8">
+                        <h2 class="mt-0">Warehouse Approval Request</h2>
+                        <h4 class="text-muted mt-0"><span t-field="doc.name"/></h4>
+                    </div>
+                    <div class="col-4 text-end">
+                        <t t-set="stamp_style"
+                           t-value="'display: inline-block; padding: 6px 14px; border: 2px solid; border-radius: 4px; font-weight: bold; letter-spacing: 1px;'"/>
+                        <span t-if="doc.state == 'approved'"
+                              t-attf-style="#{stamp_style} color: #1A7F37; border-color: #1A7F37;">APPROVED</span>
+                        <span t-elif="doc.state == 'rejected'"
+                              t-attf-style="#{stamp_style} color: #B42318; border-color: #B42318;">REJECTED</span>
+                        <span t-elif="doc.state == 'pending_approval'"
+                              t-attf-style="#{stamp_style} color: #B54708; border-color: #B54708;">PENDING APPROVAL</span>
+                        <span t-else=""
+                              t-attf-style="#{stamp_style} color: #667085; border-color: #667085;">DRAFT</span>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td class="text-muted" style="width: 40%;">Product</td>
+                                <td><span t-field="doc.product_id"/></td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Lot / Serial</td>
+                                <td><span t-field="doc.lot_id"/></td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Quantity</td>
+                                <td><span t-field="doc.quantity"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td class="text-muted" style="width: 40%;">Request Type</td>
+                                <td><span t-field="doc.request_type"/></td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Requested By</td>
+                                <td><span t-field="doc.requested_by_id"/></td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Request Date</td>
+                                <td><span t-field="doc.request_date"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <h4>Reason</h4>
+                <p t-field="doc.reason"/>
+
+                <h4 class="mt-4">Approval Levels</h4>
+                <table class="table table-sm o_main_table">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 10%;">Level</th>
+                            <th>Approver</th>
+                            <th class="text-center" style="width: 15%;">Decision</th>
+                            <th style="width: 20%;">Decided On</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="doc.approval_line_ids" t-as="line">
+                            <td class="text-center"><span t-field="line.level"/></td>
+                            <td><span t-field="line.approver_id"/></td>
+                            <td class="text-center"><span t-field="line.state"/></td>
+                            <td><span t-field="line.decision_date"/></td>
+                            <td><span t-field="line.comment"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div t-if="not doc.approval_line_ids" class="text-muted">
+                    <p>No approval levels have been defined for this request yet.</p>
+                </div>
+
+                <div class="row mt-5">
+                    <div class="col-4">
+                        <div style="border-top: 1px solid #000; padding-top: 4px;">
+                            Requested by
+                        </div>
+                    </div>
+                    <div class="col-4 offset-4">
+                        <div style="border-top: 1px solid #000; padding-top: 4px;">
+                            Final approval
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_warehouse_approval_request">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="stockguard.report_warehouse_approval_request_document"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>

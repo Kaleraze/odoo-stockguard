@@ -1,0 +1,14 @@
+<odoo>
+
+    <record id="action_report_warehouse_approval_request" model="ir.actions.report">
+        <field name="name">Approval Request</field>
+        <field name="model">warehouse.approval.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">stockguard.report_warehouse_approval_request</field>
+        <field name="report_file">stockguard.report_warehouse_approval_request</field>
+        <field name="print_report_name">'Approval Request - %s' % object.name</field>
+        <field name="binding_model_id" ref="model_warehouse_approval_request"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

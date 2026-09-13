@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_warehouse_approval_request_user,warehouse.approval.request.user,model_warehouse_approval_request,group_warehouse_user,1,1,1,0
+access_warehouse_approval_request_manager,warehouse.approval.request.manager,model_warehouse_approval_request,group_warehouse_manager,1,1,1,1
+access_warehouse_approval_line_user,warehouse.approval.line.user,model_warehouse_approval_line,group_warehouse_user,1,0,0,0
+access_warehouse_approval_line_approver,warehouse.approval.line.approver,model_warehouse_approval_line,group_warehouse_approver,1,1,1,0
+access_warehouse_approval_line_manager,warehouse.approval.line.manager,model_warehouse_approval_line,group_warehouse_manager,1,1,1,1
