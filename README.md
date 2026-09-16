@@ -36,16 +36,27 @@ StockGuard turns that into a controlled document:
 
 ## What it looks like
 
-The approval board, grouped by status. Every stage stays visible even when it is
-empty, so the process reads as a pipeline rather than changing shape with the
-data:
+**The approval board.** Every stage stays visible even when it holds nothing, so
+the process reads as a pipeline instead of changing shape with the data. Cards
+that are waiting on somebody say who, and at which level.
 
-| Draft | Pending Approval | Approved | Rejected |
-| --- | --- | --- | --- |
-| Being written up | Waiting on a named approver at a given level | Signed off, lot released | Refused, can be sent back to draft |
+![The approval board, grouped by status](docs/screenshots/kanban-board.png)
+
+**A request in flight.** Level 1 has signed, level 2 has not, and the status bar
+sits at Pending Approval. The Approve button renders only for the person the
+request is actually waiting on — another user opening this same record sees no
+button at all.
+
+![An approval request with one level signed and one pending](docs/screenshots/approval-request-form.png)
+
+**Odoo's own lot form, extended.** The StockGuard block and the Approvals smart
+button are grafted onto the existing `stock.lot` form through view inheritance.
+Nothing in Odoo's source is touched, so the module survives an upgrade.
+
+![Odoo's lot form carrying the StockGuard fields](docs/screenshots/lot-form-stockguard.png)
 
 A printed request is in [`docs/sample-approval-request.pdf`](docs/sample-approval-request.pdf) —
-two documents in one file, showing an approved request and one still pending.
+two documents in one file, one approved and one still pending.
 
 ---
 

@@ -3,7 +3,7 @@
     'version': '17.0.1.0.0',
     'category': 'Inventory',
     'summary': 'Lot control and multi-level approval workflow for restricted stock',
-    'author': 'Your Name',
+    'author': 'Kittithad Leelavivat',
     'license': 'LGPL-3',
     'depends': ['mail', 'stock'],
     'data': [

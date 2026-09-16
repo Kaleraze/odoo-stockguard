@@ -7,3 +7,9 @@ __pycache__/
 # Credentials for the production stack - never commit these
 .env
 deploy/.env
+
+# AI session notes - local only, not part of the project
+CLAUDE.md
+
+# Office temp files
+~$*
