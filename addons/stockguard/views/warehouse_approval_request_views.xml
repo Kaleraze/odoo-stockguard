@@ -68,10 +68,9 @@
                             <field name="active" invisible="1"/>
                         </group>
                     </group>
-                    <group string="Reason">
-                        <field name="reason" nolabel="1" readonly="state != 'draft'"
-                               placeholder="Why does this lot need an exception?"/>
-                    </group>
+                    <separator string="Reason"/>
+                    <field name="reason" nolabel="1" readonly="state != 'draft'"
+                           placeholder="Why does this lot need an exception?"/>
                     <notebook>
                         <page string="Approval Levels" name="approval_levels">
                             <field name="approval_line_ids" readonly="state != 'draft'">
