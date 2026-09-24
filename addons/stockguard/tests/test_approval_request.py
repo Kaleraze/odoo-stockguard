@@ -42,6 +42,19 @@ class TestWarehouseApprovalRequest(TransactionCase):
         self.assertEqual(request.requested_by_id, self.env.user)
         self.assertEqual(request.company_id, self.env.company)
 
+    def test_new_request_is_normal_priority(self):
+        request = self._create_request()
+        self.assertEqual(request.priority, '0')
+
+    def test_urgent_requests_can_be_found_by_search(self):
+        normal = self._create_request()
+        urgent = self._create_request(priority='1')
+        found = self.env['warehouse.approval.request'].search([
+            ('priority', '=', '1'),
+        ])
+        self.assertIn(urgent, found)
+        self.assertNotIn(normal, found)
+
     def test_product_is_related_from_lot(self):
         request = self._create_request()
         self.assertEqual(request.product_id, self.product)

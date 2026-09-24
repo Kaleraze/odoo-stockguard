@@ -28,6 +28,16 @@ class WarehouseApprovalRequest(models.Model):
         default='quarantine_release',
         tracking=True,
     )
+    priority = fields.Selection(
+        selection=[
+            ('0', 'Normal'),
+            ('1', 'Urgent'),
+        ],
+        string='Priority',
+        default='0',
+        index=True,
+        tracking=True,
+    )
     state = fields.Selection(
         selection=[
             ('draft', 'Draft'),

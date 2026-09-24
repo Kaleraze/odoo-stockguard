@@ -8,6 +8,7 @@
                   decoration-info="state == 'draft'"
                   decoration-warning="state == 'pending_approval'"
                   decoration-muted="state == 'rejected'">
+                <field name="priority" widget="priority" optional="show"/>
                 <field name="name"/>
                 <field name="request_date"/>
                 <field name="product_id"/>
@@ -55,6 +56,8 @@
                             <field name="product_id"/>
                             <field name="quantity" readonly="state != 'draft'"/>
                             <field name="request_type" readonly="state != 'draft'"/>
+                            <field name="priority" widget="priority"
+                                   readonly="state not in ('draft', 'pending_approval')"/>
                         </group>
                         <group name="who">
                             <field name="requested_by_id" readonly="state != 'draft'"
@@ -111,6 +114,7 @@
                             <div class="o_kanban_record_top">
                                 <div class="o_kanban_record_headings">
                                     <strong class="o_kanban_record_title">
+                                        <field name="priority" widget="priority"/>
                                         <field name="name"/>
                                     </strong>
                                     <span class="o_kanban_record_subtitle text-muted">
@@ -155,6 +159,9 @@
                 <field name="lot_id"/>
                 <field name="product_id"/>
                 <field name="requested_by_id"/>
+                <filter name="filter_urgent" string="Urgent"
+                        domain="[('priority', '=', '1')]"/>
+                <separator/>
                 <filter name="filter_waiting_for_me" string="Waiting For Me"
                         domain="[('pending_approver_ids', 'in', uid)]"/>
                 <filter name="filter_my_requests" string="My Requests"
