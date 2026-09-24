@@ -28,6 +28,8 @@ StockGuard turns that into a controlled document:
   cannot sign before level 1 has.
 - **The person who raised the request can never approve it** — enforced in the
   data layer, not just hidden in the interface.
+- A request can be flagged **urgent**, so a batch running out of shelf life does
+  not sit behind routine paperwork in the queue.
 - When the last level signs, the system **releases the lot itself**.
 - Every state change lands in Odoo's chatter, and the whole document prints to
   PDF for the audit file.
@@ -215,7 +217,7 @@ can be walked from both sides.
 
 ## Running the tests
 
-49 tests, all `TransactionCase`, covering the data model, the workflow, the
+51 tests, all `TransactionCase`, covering the data model, the workflow, the
 views and the report.
 
 ```bash
@@ -250,7 +252,7 @@ Two details worth knowing:
 │   ├── security/                  groups, record rule, access rights
 │   ├── data/                      document number sequence
 │   ├── demo/                      sample requests in every state
-│   └── tests/                     49 tests
+│   └── tests/                     51 tests
 ├── config/odoo.conf               development server config
 ├── deploy/                        hardened compose + config for a real server
 ├── docs/                          sample printed output
